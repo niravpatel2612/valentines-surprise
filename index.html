@@ -2,72 +2,335 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Special Question ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>For Khushi ❤️ | Valentine's Week</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #ffebee;
-            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 50%, #f8bbd9 100%);
+            font-family: 'Segoe UI', 'Georgia', serif;
             margin: 0;
-            overflow: hidden;
+            overflow-x: hidden;
             text-align: center;
+            padding: 20px;
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-top: max(20px, env(safe-area-inset-top));
+            -webkit-tap-highlight-color: transparent;
         }
-        .container { z-index: 1; }
-        h1 { color: #d32f2f; margin-bottom: 30px; }
+        .screen {
+            display: none;
+            max-width: 560px;
+            width: 100%;
+            z-index: 2;
+            position: relative;
+        }
+        .screen.active { display: block; animation: fadeIn 0.6s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { color: #c2185b; margin-bottom: 20px; font-size: clamp(1.4rem, 4vw, 2rem); }
+        .sub { color: #ad1457; font-size: 1rem; margin-top: 8px; }
+        .message-box {
+            background: rgba(255,255,255,0.85);
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 8px 32px rgba(233,30,99,0.15);
+            margin: 20px 0;
+            line-height: 1.7;
+            color: #4a148c;
+            font-size: 1.1rem;
+        }
+        .day-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e91e63, #ad1457);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        /* Buttons - Valentine's Day (mobile-friendly touch targets: min 44px) */
+        .buttons-wrap { position: relative; min-height: 140px; margin: 24px 0; }
         button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 14px 28px;
+            min-height: 48px;
+            min-width: 48px;
+            font-size: 1.15rem;
             margin: 10px;
             cursor: pointer;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
-            transition: 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        #yesBtn { background-color: #ff4081; color: white; }
-        #noBtn {
-            background-color: #9e9e9e;
+        @media (hover: hover) {
+            #yesBtn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(233,30,99,0.5); }
+        }
+        #yesBtn {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
             color: white;
-            position: absolute; /* Allows it to move freely */
+            box-shadow: 0 4px 15px rgba(233,30,99,0.4);
         }
-        .success-msg { font-size: 2rem; color: #ff4081; display: none; }
+        #noBtn {
+            background: #9e9e9e;
+            color: white;
+            position: fixed;
+            transition: left 0.2s ease-out, top 0.2s ease-out;
+            z-index: 10;
+            min-width: 80px;
+        }
+        .success-msg {
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            color: #c2185b;
+            display: none;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .success-msg.show { display: block; animation: fadeIn 0.6s ease; }
+
+        /* Kiss Day - floating emojis container */
+        #kissBlast {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .kiss-emoji {
+            position: absolute;
+            font-size: 2rem;
+            animation: kissFloat 2.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes kissFloat {
+            0% {
+                opacity: 1;
+                transform: scale(0.3) translate(0, 0);
+            }
+            50% { opacity: 1; }
+            100% {
+                opacity: 0;
+                transform: scale(1.2) translate(var(--dx), var(--dy));
+            }
+        }
+
+        /* Out of range / other days */
+        .generic-msg { color: #6a1b9a; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="mainContainer">
-        <h1 id="question">Will you be my Valentine? ❤️</h1>
-        <div class="buttons">
-            <button id="yesBtn" onclick="celebrate()">Yes!</button>
-            <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
+    <!-- Promise Day - Feb 11 -->
+    <div class="screen" id="screen-promise">
+        <span class="day-badge">Promise Day 💝</span>
+        <h1>My Promises to You, Khushi</h1>
+        <p class="sub">Forever &amp; Always</p>
+        <div class="message-box">
+            I promise to stand by you in every season of life.<br>
+            I promise to make you smile when you're down.<br>
+            I promise to listen, to understand, and to choose us every day.<br>
+            I promise to love you more with each passing day.<br><br>
+            <strong>You are my home, Khushi. I love you. 💕</strong>
         </div>
-        <div id="message" class="success-msg">Yay! I knew you'd say yes! 🥰💍</div>
+    </div>
+
+    <!-- Hug Day - Feb 12 -->
+    <div class="screen" id="screen-hug">
+        <span class="day-badge">Hug Day 🤗</span>
+        <h1>Virtual Hug for You, Khushi</h1>
+        <p class="sub">Wish I could hug you right now!</p>
+        <div class="message-box">
+            Sending you the warmest, tightest hug today and every day.<br>
+            You deserve all the love and comfort in the world.<br><br>
+            <strong>Consider yourself hugged! 🤗❤️</strong>
+        </div>
+    </div>
+
+    <!-- Kiss Day - Feb 13 -->
+    <div class="screen" id="screen-kiss">
+        <span class="day-badge">Kiss Day 😘</span>
+        <h1>Kiss Day Blast for Khushi 😘</h1>
+        <p class="message-box">
+            Sending you infinite kisses today!<br>
+            💋 💋 💋
+        </p>
+        <div id="kissBlast"></div>
+    </div>
+
+    <!-- Valentine's Day - Feb 14 -->
+    <div class="screen" id="screen-valentine">
+        <span class="day-badge">Valentine's Day 💖</span>
+        <h1 id="question">Will you be my Valentine, Khushi? ❤️</h1>
+        <div class="buttons-wrap">
+            <div class="buttons" id="valButtons">
+                <button id="yesBtn">Yes!</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+        <div id="message" class="success-msg">
+            Yay! I knew you'd say yes! You make every day special, Khushi. Happy Valentine's! 🥰💖
+        </div>
+    </div>
+
+    <!-- Other days (Rose, Propose, Chocolate, Teddy) - simple themed message -->
+    <div class="screen" id="screen-other">
+        <span class="day-badge" id="otherDayBadge">Valentine's Week 🌹</span>
+        <h1 id="otherDayTitle">For Khushi ❤️</h1>
+        <div class="message-box generic-msg" id="otherDayMessage"></div>
+    </div>
+
+    <!-- Out of range (before Feb 7 or after Feb 14) -->
+    <div class="screen" id="screen-out">
+        <span class="day-badge">For Khushi ❤️</span>
+        <h1>Valentine's Week</h1>
+        <div class="message-box generic-msg" id="outMessage">
+            Something special is waiting for you during Valentine's Week (Feb 7–14). Come back then! 💕
+        </div>
     </div>
 
     <script>
-        function moveButton() {
-            const noBtn = document.getElementById('noBtn');
-            // Calculate random positions, keeping button within viewport
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
-            
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
-        }
+        (function() {
+            // Get date: from query ?date=YYYY-MM-DD (as calendar date, no timezone) or system date
+            // Table: Feb 7=Rose, 8=Propose, 9=Chocolate, 10=Teddy, 11=Promise, 12=Hug, 13=Kiss, 14=Valentine's
+            function getDisplayDay() {
+                var params = new URLSearchParams(window.location.search);
+                var dateStr = params.get('date');
+                if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                    var parts = dateStr.split('-');
+                    var y = parseInt(parts[0], 10);
+                    var m = parseInt(parts[1], 10);
+                    var d = parseInt(parts[2], 10);
+                    if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+                        return { month: m, date: d };
+                    }
+                }
+                var now = new Date();
+                return { month: now.getMonth() + 1, date: now.getDate() };
+            }
 
-        function celebrate() {
-            document.getElementById('question').style.display = 'none';
-            document.querySelector('.buttons').style.display = 'none';
-            document.getElementById('message').style.display = 'block';
-            document.body.style.backgroundColor = "#ffcdd2";
-            
-            // Optional: You could add a simple alert too
-            // alert("Best choice ever! ❤️");
-        }
+            var display = getDisplayDay();
+            var month = display.month;
+            var date = display.date;
+
+            var isFeb = (month === 2);
+            var dayNum = isFeb ? date : 0;
+
+            var screens = {
+                promise:  document.getElementById('screen-promise'),
+                hug:      document.getElementById('screen-hug'),
+                kiss:     document.getElementById('screen-kiss'),
+                valentine: document.getElementById('screen-valentine'),
+                other:    document.getElementById('screen-other'),
+                out:      document.getElementById('screen-out')
+            };
+
+            var dayNames = {
+                7:  { name: 'Rose Day', emoji: '🌹', msg: 'You are the most beautiful rose in my life, Khushi. 🌹❤️' },
+                8:  { name: 'Propose Day', emoji: '💐', msg: 'Every day with you feels like a new proposal. I choose you, again and again. 💐' },
+                9:  { name: 'Chocolate Day', emoji: '🍫', msg: 'You\'re sweeter than any chocolate, Khushi. 🍫❤️' },
+                10: { name: 'Teddy Day', emoji: '🧸', msg: 'You\'re my cuddly forever, Khushi. Happy Teddy Day! 🧸💕' }
+            };
+
+            function showScreen(id) {
+                for (var key in screens) screens[key].classList.remove('active');
+                if (screens[id]) screens[id].classList.add('active');
+            }
+
+            function runKissBlast() {
+                var container = document.getElementById('kissBlast');
+                var emojis = ['😘', '💋', '😗', '🥰', '💕'];
+                var centerX = window.innerWidth / 2;
+                var centerY = window.innerHeight / 2;
+
+                function addBurst() {
+                    for (var i = 0; i < 12; i++) {
+                        var el = document.createElement('span');
+                        el.className = 'kiss-emoji';
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        var angle = (i / 12) * Math.PI * 2 + Math.random() * 0.5;
+                        var dist = 80 + Math.random() * 120;
+                        var dx = Math.cos(angle) * dist * (3 + Math.random() * 2);
+                        var dy = Math.sin(angle) * dist * (3 + Math.random() * 2);
+                        el.style.left = (centerX - 20) + 'px';
+                        el.style.top = (centerY - 20) + 'px';
+                        el.style.setProperty('--dx', dx + 'px');
+                        el.style.setProperty('--dy', dy + 'px');
+                        container.appendChild(el);
+                        setTimeout(function(e) { return function() { if (e.parentNode) e.parentNode.removeChild(e); }; }(el), 2600);
+                    }
+                }
+
+                addBurst();
+                var t = setInterval(addBurst, 400);
+                setTimeout(function() { clearInterval(t); }, 3200);
+            }
+
+            // No button runs away on click/tap only (works on mobile + desktop; no hover on touch devices)
+            function initValentineScreen() {
+                var noBtn = document.getElementById('noBtn');
+                var yesBtn = document.getElementById('yesBtn');
+                var question = document.getElementById('question');
+                var buttons = document.getElementById('valButtons');
+                var message = document.getElementById('message');
+
+                function moveNoButton() {
+                    var w = window.innerWidth;
+                    var h = window.innerHeight;
+                    var bw = noBtn.offsetWidth;
+                    var bh = noBtn.offsetHeight;
+                    var padding = 40;
+                    noBtn.style.left = (padding + Math.random() * (w - bw - 2 * padding)) + 'px';
+                    noBtn.style.top = (padding + Math.random() * (h - bh - 2 * padding)) + 'px';
+                }
+
+                moveNoButton();
+
+                noBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    moveNoButton();
+                });
+
+                yesBtn.addEventListener('click', function() {
+                    question.style.display = 'none';
+                    buttons.style.display = 'none';
+                    message.classList.add('show');
+                    document.body.style.background = 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)';
+                });
+            }
+
+            // Route by day
+            if (!isFeb || dayNum < 7) {
+                showScreen('out');
+            } else if (dayNum === 7 || dayNum === 8 || dayNum === 9 || dayNum === 10) {
+                var info = dayNames[dayNum];
+                document.getElementById('otherDayBadge').textContent = info.name + ' ' + info.emoji;
+                document.getElementById('otherDayTitle').textContent = info.name + ' – For Khushi ❤️';
+                document.getElementById('otherDayMessage').textContent = info.msg;
+                showScreen('other');
+            } else if (dayNum === 11) {
+                showScreen('promise');
+            } else if (dayNum === 12) {
+                showScreen('hug');
+            } else if (dayNum === 13) {
+                showScreen('kiss');
+                setTimeout(runKissBlast, 300);
+            } else if (dayNum === 14) {
+                showScreen('valentine');
+                initValentineScreen();
+            } else {
+                showScreen('out');
+            }
+        })();
     </script>
 </body>
 </html>
